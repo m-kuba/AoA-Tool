@@ -1,11 +1,12 @@
 import win32com.client
+import pythoncom
 import math
 import os
 import time
 
 #Solidworks API
 swDocPART = 1   #1 - part / 2 - asembly / 3 - drawing
-swSaveAsCurrenVersion = 0
+swSaveAsCurrentVersion = 0
 swSaveAsOptions_Silent = 1
 swSaveAsOptions_Copy = 2
 
@@ -27,8 +28,12 @@ def run_aero_sweep():
     swApp.Visible = True    #Change to true to show SolidWorks while working
 
     try:
-        print("Opening base model: {baseFileName}...")
-        Model = swApp.openDoc6(baseDirectory, swDocPART, 1, "", 0, 0)   #(directory, file type, silent mode, configuration, error code, error code)
+        print(f"Opening base model: {baseFileName}...")
+
+        argErr = win32com.client.VARIANT(pythoncom.VT_BYREF | pythoncom.VT_I4, 0)
+        argWarn = win32com.client.VARIANT(pythoncom.VT_BYREF | pythoncom.VT_I4, 0)
+
+        Model = swApp.OpenDoc6(baseDirectory, swDocPART, 1, "", argErr, argWarn)   #(directory, file type, silent mode, configuration, error code, error code)
 
         if Model is None:
             print ("Error: fialed to open file")
@@ -36,7 +41,7 @@ def run_aero_sweep():
         
         swDimension = Model.Parameter(angleName)
         if swDimension is None:
-            print("Critical error: angle {angleName} not found, check the name in SolidWorks")
+            print(f"Critical error: angle {angleName} not found, check the name in SolidWorks")
             return
         
         print("Generationg variants...")
@@ -44,12 +49,13 @@ def run_aero_sweep():
         for angleDeg in newAngles:
             angleRad = angleDeg * (math.pi / 180.0)     #Conversion to radians
             swDimension.SystemValue = angleRad
-            Model.EditRebuild3()
+            Model.EditRebuild3
 
             newFileName = f"GT3Wing_{angleDeg}deg.sldprt"
             saveDirectory = os.path.join(workingDirectory, newFileName)
+            saveOptions = swSaveAsOptions_Silent + swSaveAsOptions_Copy
 
-            success = Model.Extension.SaveAs3(saveDirectory, swSaveAsCurrenVersion, swSaveAsOptions_Silent, None, 0, 0)
+            success = Model.SaveAs3(saveDirectory, swSaveAsCurrentVersion, saveOptions)
 
             if success:
                 print(f"Generation successful: {newFileName}")
@@ -66,7 +72,7 @@ def run_aero_sweep():
 
     finally:
         if 'Model' in locals() and Model is not None:
-            swApp.CloseDoc(Model.GetTitle())
+            swApp.CloseDoc(Model.GetTitle)
             print("Base model file closed")
 
 if __name__ == "__main__":
