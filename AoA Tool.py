@@ -77,3 +77,5 @@ def run_aero_sweep():
 
 if __name__ == "__main__":
     run_aero_sweep()
+
+input("Press enter to close...")
