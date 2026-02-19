@@ -14,7 +14,7 @@ def run_aero_sweep():
     #configuration
     angleName = "AoA_Rear_Wing@AirfoilSketch"
     baseFileName = "GT3Wing.sldprt"
-    newAngles = [2.0, 6.0, 10.0, 15.0]
+    newAngles = [3.0, 6.0, 10.0, 15.0]
 
     workingDirectory = os.getcwd()
     baseDirectory = os.path.join(workingDirectory, baseFileName)
@@ -25,7 +25,7 @@ def run_aero_sweep():
     
     print ("Launching SolidWorks in the background...")
     swApp = win32com.client.Dispatch("SldWorks.Application")
-    swApp.Visible = True    #Change to true to show SolidWorks while working
+    swApp.Visible = False    #Change to true to show SolidWorks while working
 
     try:
         print(f"Opening base model: {baseFileName}...")
@@ -57,7 +57,7 @@ def run_aero_sweep():
 
             success = Model.SaveAs3(saveDirectory, swSaveAsCurrentVersion, saveOptions)
 
-            if success:
+            if success == 0:
                 print(f"Generation successful: {newFileName}")
             
             else:
